@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard - Hostel Resolve</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<body class="bg-light">
+  <div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="fw-bold text-primary">Hostel Head Dashboard</h2>
+      <button id="logoutBtn" class="btn btn-outline-danger">Logout</button>
+    </div>
+
+    <!-- Filters -->
+    <div class="card shadow border-0 mb-4">
+      <div class="card-header bg-dark text-white fw-bold">
+        Filter Active Complaints
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label for="filterCategory" class="form-label fw-semibold">Category</label>
+            <select class="form-select" id="filterCategory">
+              <option value="">All Categories</option>
+              <option value="water">Water</option>
+              <option value="electricity">Electricity</option>
+              <option value="cleaning">Cleaning</option>
+              <option value="internet">Internet</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="filterRoom" class="form-label fw-semibold">Room Number</label>
+            <input type="text" class="form-control" id="filterRoom" placeholder="e.g. A-101" />
+          </div>
+          <div class="col-md-3">
+            <label for="filterStatus" class="form-label fw-semibold">Status</label>
+            <select class="form-select" id="filterStatus">
+              <option value="">All Active</option>
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+            </select>
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <button id="applyFilterBtn" class="btn btn-primary w-100">Apply Filters</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Complaints Table -->
+    <div class="card shadow border-0 mb-5">
+      <div class="card-header bg-warning text-dark fw-bold">
+        Active Complaints
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Student Roll</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Room</th>
+                <th>Status</th>
+                <th>Photo</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="activeComplaintsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resolved History Table -->
+    <div class="card shadow border-0">
+      <div class="card-header bg-success text-white fw-bold">
+        Resolved History
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Student Roll</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Room</th>
+                <th>Resolved At</th>
+                <th>Photo</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="message" class="mt-4 text-center fw-medium"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="scripts/admin.js"></script>
+</body>
+</html>
