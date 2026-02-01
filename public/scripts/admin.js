@@ -76,7 +76,7 @@ async function loadActiveComplaints() {
   }
 }
 
-// Load resolved history
+// Load resolved history (with Delete button)
 async function loadHistory() {
   try {
     const res = await fetch('/api/complaints/history', {
@@ -90,7 +90,7 @@ async function loadHistory() {
     historyBody.innerHTML = '';
 
     if (history.length === 0) {
-      historyBody.innerHTML = '<tr><td colspan="7" class="text-center py-4">No resolved complaints yet.</td></tr>';
+      historyBody.innerHTML = '<tr><td colspan="8" class="text-center py-4">No resolved complaints yet.</td></tr>';
       return;
     }
 
@@ -106,6 +106,9 @@ async function loadHistory() {
         <td>
           ${c.imagePath ? `<img src="/${c.imagePath}" class="preview" alt="Complaint photo">` : 'No photo'}
         </td>
+        <td>
+          <button class="btn btn-sm btn-danger" onclick="deleteComplaint('${c._id}')">Delete</button>
+        </td>
       `;
       historyBody.appendChild(row);
     });
@@ -115,7 +118,7 @@ async function loadHistory() {
   }
 }
 
-// Update status function (called from buttons)
+// Update status function
 window.updateStatus = async (id, newStatus) => {
   if (!confirm(`Are you sure you want to mark this as "${newStatus}"?`)) return;
 
@@ -142,6 +145,34 @@ window.updateStatus = async (id, newStatus) => {
     }
   } catch (err) {
     messageDiv.textContent = 'Network error';
+    messageDiv.classList.add('error');
+  }
+};
+
+// Delete resolved complaint
+window.deleteComplaint = async (id) => {
+  if (!confirm('Are you sure you want to permanently delete this resolved complaint? This action cannot be undone.')) return;
+
+  try {
+    const res = await fetch(`/api/complaints/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (res.ok) {
+      messageDiv.textContent = 'Complaint deleted successfully!';
+      messageDiv.classList.remove('error');
+      messageDiv.classList.add('success');
+      loadHistory(); // Refresh history table
+    } else {
+      const data = await res.json();
+      messageDiv.textContent = data.message || 'Failed to delete complaint';
+      messageDiv.classList.add('error');
+    }
+  } catch (err) {
+    messageDiv.textContent = 'Network error during delete';
     messageDiv.classList.add('error');
   }
 };
