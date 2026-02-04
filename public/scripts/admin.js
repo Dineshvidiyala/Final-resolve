@@ -46,7 +46,6 @@ document.getElementById('excelUploadInput')?.addEventListener('change', async (e
       uploadMessage.textContent = data.message || 'Upload failed. Check file format.';
     }
 
-    // Auto hide after 6 seconds
     setTimeout(() => uploadMessage.classList.add('d-none'), 6000);
   } catch (err) {
     uploadMessage.classList.remove('alert-info');
@@ -58,7 +57,7 @@ document.getElementById('excelUploadInput')?.addEventListener('change', async (e
   e.target.value = '';
 });
 
-// Load active complaints (shows Name, Roll No, Mobile, Lab, Location)
+// Load active complaints
 async function loadActiveComplaints() {
   const category = document.getElementById('filterCategory').value;
   const roomNumber = document.getElementById('filterRoom').value.trim();
@@ -87,19 +86,22 @@ async function loadActiveComplaints() {
     activeBody.innerHTML = '';
 
     if (complaints.length === 0) {
-      activeBody.innerHTML = '<tr><td colspan="10" class="text-center py-4">No active complaints found.</td></tr>';
+      activeBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">No active complaints found.</td></tr>';
       return;
     }
 
     complaints.forEach(c => {
       const student = c.studentId || {};
+      console.log('Active complaint student data:', student); // Debug (remove later)
+
       const row = document.createElement('tr');
       row.innerHTML = `
         <td>${student.name || 'Unknown'}</td>
         <td>${student.rollNumber || 'Unknown'}</td>
         <td>${student.mobile || '-'}</td>
-        <td>${student.roomNumber || '-'}</td>
-        <td>${c.location || '-'}</td> <!-- NEW: Location -->
+        <td>${student.roomNumber || '-'}</td>        <!-- Lab from Excel -->
+        <td>${c.roomNumber || '-'}</td>              <!-- Hostel Room from complaint -->
+        <td>${c.location || '-'}</td>
         <td>${c.title}</td>
         <td><span class="badge bg-info">${c.category}</span></td>
         <td>${c.description.substring(0, 80)}${c.description.length > 80 ? '...' : ''}</td>
@@ -114,10 +116,11 @@ async function loadActiveComplaints() {
   } catch (err) {
     messageDiv.textContent = err.message || 'Error loading active complaints';
     messageDiv.classList.add('error');
+    console.error('Load active error:', err);
   }
 }
 
-// Load resolved history (shows Name, Roll No, Mobile, Lab, Location + Delete)
+// Load resolved history
 async function loadHistory() {
   try {
     const res = await fetch('/api/complaints/history', {
@@ -131,19 +134,22 @@ async function loadHistory() {
     historyBody.innerHTML = '';
 
     if (history.length === 0) {
-      historyBody.innerHTML = '<tr><td colspan="9" class="text-center py-4">No resolved complaints yet.</td></tr>';
+      historyBody.innerHTML = '<tr><td colspan="10" class="text-center py-4">No resolved complaints yet.</td></tr>';
       return;
     }
 
     history.forEach(c => {
       const student = c.studentId || {};
+      console.log('History complaint student data:', student); // Debug (remove later)
+
       const row = document.createElement('tr');
       row.innerHTML = `
         <td>${student.name || 'Unknown'}</td>
         <td>${student.rollNumber || 'Unknown'}</td>
         <td>${student.mobile || '-'}</td>
-        <td>${student.roomNumber || '-'}</td>
-        <td>${c.location || '-'}</td> <!-- NEW: Location -->
+        <td>${student.roomNumber || '-'}</td>        <!-- Lab from Excel -->
+        <td>${c.roomNumber || '-'}</td>              <!-- Hostel Room from complaint -->
+        <td>${c.location || '-'}</td>
         <td>${c.title}</td>
         <td>${new Date(c.updatedAt).toLocaleString()}</td>
         <td>${c.imagePath ? `<img src="/${c.imagePath}" class="preview" alt="Photo">` : 'No photo'}</td>
@@ -156,6 +162,7 @@ async function loadHistory() {
   } catch (err) {
     messageDiv.textContent = err.message || 'Error loading history';
     messageDiv.classList.add('error');
+    console.error('Load history error:', err);
   }
 }
 
