@@ -11,8 +11,18 @@
   <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="fw-bold text-primary">Hostel Head Dashboard</h2>
-      <button id="logoutBtn" class="btn btn-outline-danger">Logout</button>
+      <div class="d-flex gap-3 align-items-center">
+        <!-- Upload button beside Logout -->
+        <label class="btn btn-success mb-0">
+          <input type="file" id="excelUploadInput" accept=".xlsx" hidden />
+          Upload Students Excel
+        </label>
+        <button id="logoutBtn" class="btn btn-outline-danger">Logout</button>
+      </div>
     </div>
+
+    <!-- Upload success/error message -->
+    <div id="uploadMessage" class="alert d-none text-center fw-bold fs-5 mb-4"></div>
 
     <!-- Filters -->
     <div class="card shadow border-0 mb-4">
@@ -61,12 +71,14 @@
           <table class="table table-hover mb-0">
             <thead>
               <tr>
-                <th>Student Roll</th>
+                <th>Name</th>
+                <th>Roll No</th>
+                <th>Mobile</th>
+                <th>Lab</th>
+                <th>Location</th> <!-- NEW -->
                 <th>Title</th>
                 <th>Category</th>
                 <th>Description</th>
-                <th>Room</th>
-                <th>Status</th>
                 <th>Photo</th>
                 <th>Actions</th>
               </tr>
@@ -87,13 +99,15 @@
           <table class="table table-hover mb-0">
             <thead>
               <tr>
-                <th>Student Roll</th>
+                <th>Name</th>
+                <th>Roll No</th>
+                <th>Mobile</th>
+                <th>Lab</th>
+                <th>Location</th> <!-- NEW -->
                 <th>Title</th>
-                <th>Category</th>
-                <th>Description</th>
-                <th>Room</th>
                 <th>Resolved At</th>
                 <th>Photo</th>
+                <th>Delete</th>
               </tr>
             </thead>
             <tbody id="historyBody"></tbody>
