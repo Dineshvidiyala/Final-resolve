@@ -39,9 +39,21 @@
             </div>
           </div>
 
-          <div class="mb-3">
-            <label for="description" class="form-label fw-semibold">Description</label>
-            <textarea class="form-control" id="description" rows="4" placeholder="Describe the issue in detail..." required></textarea>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="description" class="form-label fw-semibold">Description</label>
+              <textarea class="form-control" id="description" rows="4" placeholder="Describe the issue in detail..." required></textarea>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="location" class="form-label fw-semibold">Location</label>
+              <select class="form-select" id="location" required>
+                <option value="" disabled selected>Select location</option>
+                <option value="Hostel">Hostel</option>
+                <option value="Mess">Mess</option>
+                <option value="Class">Class</option>
+                <option value="Ground">Ground</option>
+              </select>
+            </div>
           </div>
 
           <div class="row">
