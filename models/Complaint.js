@@ -20,6 +20,12 @@ const complaintSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  location: {  // ← NEW FIELD
+    type: String,
+    enum: ['Hostel', 'Mess', 'Class', 'Ground'],
+    required: true,
+    trim: true
+  },
   imagePath: {
     type: String  // path to uploaded image in /uploads folder
   },
