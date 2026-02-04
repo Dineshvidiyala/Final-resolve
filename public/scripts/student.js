@@ -45,6 +45,7 @@ async function loadComplaints() {
         <td><span class="badge bg-info">${c.category}</span></td>
         <td>${c.description.substring(0, 80)}${c.description.length > 80 ? '...' : ''}</td>
         <td>${c.roomNumber}</td>
+        <td>${c.location || '-'}</td> <!-- NEW: shows Location if exists -->
         <td>
           <span class="badge ${c.status === 'Resolved' ? 'bg-success' : c.status === 'In Progress' ? 'bg-warning' : 'bg-danger'}">
             ${c.status}
@@ -63,15 +64,25 @@ async function loadComplaints() {
   }
 }
 
-// Submit new complaint
+// Submit new complaint (with location)
 document.getElementById('complaintForm').addEventListener('submit', async (e) => {
   e.preventDefault();
+
+  const location = document.getElementById('location').value;
+
+  // Client-side check (extra safety)
+  if (!location) {
+    messageDiv.textContent = 'Please select a Location';
+    messageDiv.classList.add('error');
+    return;
+  }
 
   const formData = new FormData();
   formData.append('title', document.getElementById('title').value.trim());
   formData.append('category', document.getElementById('category').value);
   formData.append('description', document.getElementById('description').value.trim());
   formData.append('roomNumber', document.getElementById('roomNumber').value.trim());
+  formData.append('location', location); // NEW: send location
 
   const imageFile = document.getElementById('image').files[0];
   if (imageFile) {
