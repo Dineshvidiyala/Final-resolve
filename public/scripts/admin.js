@@ -5,6 +5,7 @@ if (!token) {
 }
 
 const messageDiv = document.getElementById('message');
+const uploadMessage = document.getElementById('uploadMessage');
 const activeBody = document.getElementById('activeComplaintsBody');
 const historyBody = document.getElementById('historyBody');
 
@@ -14,7 +15,50 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
   window.location.href = 'index.html';
 });
 
-// Load active complaints with filters
+// Handle Excel upload from button
+document.getElementById('excelUploadInput')?.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  uploadMessage.classList.remove('d-none', 'alert-success', 'alert-danger');
+  uploadMessage.classList.add('alert-info');
+  uploadMessage.textContent = 'Uploading... Please wait';
+
+  const formData = new FormData();
+  formData.append('excel', file);
+
+  try {
+    const res = await fetch('/api/upload-students', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: formData
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      uploadMessage.classList.remove('alert-info');
+      uploadMessage.classList.add('alert-success');
+      uploadMessage.textContent = data.message || `Uploaded Successfully! ${data.count || 0} students added.`;
+    } else {
+      uploadMessage.classList.remove('alert-info');
+      uploadMessage.classList.add('alert-danger');
+      uploadMessage.textContent = data.message || 'Upload failed. Check file format.';
+    }
+
+    // Auto hide after 6 seconds
+    setTimeout(() => uploadMessage.classList.add('d-none'), 6000);
+  } catch (err) {
+    uploadMessage.classList.remove('alert-info');
+    uploadMessage.classList.add('alert-danger');
+    uploadMessage.textContent = 'Network error during upload.';
+    console.error('Upload error:', err);
+  }
+
+  e.target.value = '';
+});
+
+// Load active complaints (shows Name, Roll No, Mobile, Lab, Location)
 async function loadActiveComplaints() {
   const category = document.getElementById('filterCategory').value;
   const roomNumber = document.getElementById('filterRoom').value.trim();
@@ -43,26 +87,23 @@ async function loadActiveComplaints() {
     activeBody.innerHTML = '';
 
     if (complaints.length === 0) {
-      activeBody.innerHTML = '<tr><td colspan="8" class="text-center py-4">No active complaints found.</td></tr>';
+      activeBody.innerHTML = '<tr><td colspan="10" class="text-center py-4">No active complaints found.</td></tr>';
       return;
     }
 
     complaints.forEach(c => {
+      const student = c.studentId || {};
       const row = document.createElement('tr');
       row.innerHTML = `
-        <td>${c.studentId?.rollNumber || 'Unknown'}</td>
+        <td>${student.name || 'Unknown'}</td>
+        <td>${student.rollNumber || 'Unknown'}</td>
+        <td>${student.mobile || '-'}</td>
+        <td>${student.roomNumber || '-'}</td>
+        <td>${c.location || '-'}</td> <!-- NEW: Location -->
         <td>${c.title}</td>
         <td><span class="badge bg-info">${c.category}</span></td>
         <td>${c.description.substring(0, 80)}${c.description.length > 80 ? '...' : ''}</td>
-        <td>${c.roomNumber}</td>
-        <td>
-          <span class="badge ${c.status === 'Resolved' ? 'bg-success' : c.status === 'In Progress' ? 'bg-warning' : 'bg-danger'}">
-            ${c.status}
-          </span>
-        </td>
-        <td>
-          ${c.imagePath ? `<img src="/${c.imagePath}" class="preview" alt="Complaint photo">` : 'No photo'}
-        </td>
+        <td>${c.imagePath ? `<img src="/${c.imagePath}" class="preview" alt="Photo">` : 'No photo'}</td>
         <td>
           <button class="btn btn-sm btn-warning me-1" onclick="updateStatus('${c._id}', 'In Progress')">In Progress</button>
           <button class="btn btn-sm btn-success" onclick="updateStatus('${c._id}', 'Resolved')">Resolve</button>
@@ -76,7 +117,7 @@ async function loadActiveComplaints() {
   }
 }
 
-// Load resolved history (with Delete button)
+// Load resolved history (shows Name, Roll No, Mobile, Lab, Location + Delete)
 async function loadHistory() {
   try {
     const res = await fetch('/api/complaints/history', {
@@ -90,22 +131,22 @@ async function loadHistory() {
     historyBody.innerHTML = '';
 
     if (history.length === 0) {
-      historyBody.innerHTML = '<tr><td colspan="8" class="text-center py-4">No resolved complaints yet.</td></tr>';
+      historyBody.innerHTML = '<tr><td colspan="9" class="text-center py-4">No resolved complaints yet.</td></tr>';
       return;
     }
 
     history.forEach(c => {
+      const student = c.studentId || {};
       const row = document.createElement('tr');
       row.innerHTML = `
-        <td>${c.studentId?.rollNumber || 'Unknown'}</td>
+        <td>${student.name || 'Unknown'}</td>
+        <td>${student.rollNumber || 'Unknown'}</td>
+        <td>${student.mobile || '-'}</td>
+        <td>${student.roomNumber || '-'}</td>
+        <td>${c.location || '-'}</td> <!-- NEW: Location -->
         <td>${c.title}</td>
-        <td><span class="badge bg-info">${c.category}</span></td>
-        <td>${c.description.substring(0, 80)}${c.description.length > 80 ? '...' : ''}</td>
-        <td>${c.roomNumber}</td>
         <td>${new Date(c.updatedAt).toLocaleString()}</td>
-        <td>
-          ${c.imagePath ? `<img src="/${c.imagePath}" class="preview" alt="Complaint photo">` : 'No photo'}
-        </td>
+        <td>${c.imagePath ? `<img src="/${c.imagePath}" class="preview" alt="Photo">` : 'No photo'}</td>
         <td>
           <button class="btn btn-sm btn-danger" onclick="deleteComplaint('${c._id}')">Delete</button>
         </td>
@@ -118,17 +159,14 @@ async function loadHistory() {
   }
 }
 
-// Update status function
+// Update status
 window.updateStatus = async (id, newStatus) => {
-  if (!confirm(`Are you sure you want to mark this as "${newStatus}"?`)) return;
+  if (!confirm(`Mark as "${newStatus}"?`)) return;
 
   try {
     const res = await fetch(`/api/complaints/${id}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ status: newStatus })
     });
 
@@ -140,7 +178,7 @@ window.updateStatus = async (id, newStatus) => {
       loadHistory();
     } else {
       const data = await res.json();
-      messageDiv.textContent = data.message || 'Failed to update status';
+      messageDiv.textContent = data.message || 'Failed to update';
       messageDiv.classList.add('error');
     }
   } catch (err) {
@@ -151,24 +189,22 @@ window.updateStatus = async (id, newStatus) => {
 
 // Delete resolved complaint
 window.deleteComplaint = async (id) => {
-  if (!confirm('Are you sure you want to permanently delete this resolved complaint? This action cannot be undone.')) return;
+  if (!confirm('Permanently delete this resolved complaint?')) return;
 
   try {
     const res = await fetch(`/api/complaints/${id}`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      headers: { 'Authorization': `Bearer ${token}` }
     });
 
     if (res.ok) {
-      messageDiv.textContent = 'Complaint deleted successfully!';
+      messageDiv.textContent = 'Deleted successfully!';
       messageDiv.classList.remove('error');
       messageDiv.classList.add('success');
-      loadHistory(); // Refresh history table
+      loadHistory();
     } else {
       const data = await res.json();
-      messageDiv.textContent = data.message || 'Failed to delete complaint';
+      messageDiv.textContent = data.message || 'Delete failed';
       messageDiv.classList.add('error');
     }
   } catch (err) {
@@ -177,12 +213,10 @@ window.deleteComplaint = async (id) => {
   }
 };
 
-// Apply filters button
-document.getElementById('applyFilterBtn').addEventListener('click', () => {
-  loadActiveComplaints();
-});
+// Apply filters
+document.getElementById('applyFilterBtn').addEventListener('click', loadActiveComplaints);
 
-// Initial load + auto-refresh every 5 seconds
+// Initial load + auto-refresh
 loadActiveComplaints();
 loadHistory();
 setInterval(() => {
