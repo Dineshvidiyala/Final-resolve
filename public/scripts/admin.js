@@ -139,19 +139,19 @@ async function loadHistory() {
       const student = c.studentId || {};
       const row = document.createElement('tr');
       row.innerHTML = `
-      <td data-label="Name">${student.name || 'Unknown'}</td>
-      <td data-label="Roll No">${student.rollNumber || 'Unknown'}</td>
-      <td data-label="Mobile">${student.mobile || '-'}</td>
-      <td data-label="Lab">${student.roomNumber || '-'}</td>
-      <td data-label="Room">${c.roomNumber || '-'}</td>
-      <td data-label="Location">${c.location || '-'}</td>
-      <td data-label="Title">${c.title}</td>
-      <td data-label="Resolved At">${new Date(c.updatedAt).toLocaleString()}</td>
-      <td data-label="Photo">${c.imagePath ? `<img src="/${c.imagePath}" class="preview" alt="Photo">` : 'No photo'}</td>
-      <td data-label="Delete">
-        <button class="btn btn-sm btn-danger" onclick="deleteComplaint('${c._id}')">Delete</button>
-      </td>
-    `;
+        <td data-label="Name">${student.name || 'Unknown'}</td>
+        <td data-label="Roll No">${student.rollNumber || 'Unknown'}</td>
+        <td data-label="Mobile">${student.mobile || '-'}</td>
+        <td data-label="Lab">${student.roomNumber || '-'}</td>
+        <td data-label="Room">${c.roomNumber || '-'}</td>
+        <td data-label="Location">${c.location || '-'}</td>
+        <td data-label="Title">${c.title}</td>
+        <td data-label="Resolved At">${new Date(c.updatedAt).toLocaleString()}</td>
+        <td data-label="Photo">${c.imagePath ? `<img src="/${c.imagePath}" class="preview" alt="Photo">` : 'No photo'}</td>
+        <td data-label="Delete">
+          <button class="btn btn-sm btn-danger" onclick="deleteComplaint('${c._id}')">Delete</button>
+        </td>
+      `;
       historyBody.appendChild(row);
     });
   } catch (err) {
@@ -180,7 +180,6 @@ window.updateStatus = async (id, newStatus, button) => {
       messageDiv.classList.remove('error');
       messageDiv.classList.add('success');
 
-      // Show success on button for 2 seconds
       button.innerHTML = 'Done!';
       button.classList.add('btn-success');
 
