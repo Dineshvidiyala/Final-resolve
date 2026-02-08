@@ -5,6 +5,7 @@ if (!token) {
 }
 
 const messageDiv = document.getElementById('message');
+const submitBtn = document.querySelector('#complaintForm button[type="submit"]');
 const complaintsBody = document.getElementById('complaintsTableBody');
 
 // Logout button
@@ -34,7 +35,7 @@ async function loadComplaints() {
     complaintsBody.innerHTML = ''; // Clear table
 
     if (complaints.length === 0) {
-      complaintsBody.innerHTML = '<tr><td colspan="7" class="text-center py-4">No complaints submitted yet.</td></tr>';
+      complaintsBody.innerHTML = '<tr><td colspan="8" class="text-center py-4">No complaints submitted yet.</td></tr>';
       return;
     }
 
@@ -44,8 +45,8 @@ async function loadComplaints() {
         <td>${c.title}</td>
         <td><span class="badge bg-info">${c.category}</span></td>
         <td>${c.description.substring(0, 80)}${c.description.length > 80 ? '...' : ''}</td>
-        <td>${c.roomNumber}</td>
-        <td>${c.location || '-'}</td> <!-- NEW: shows Location if exists -->
+        <td>${c.roomNumber || '-'}</td>
+        <td>${c.location || '-'}</td>
         <td>
           <span class="badge ${c.status === 'Resolved' ? 'bg-success' : c.status === 'In Progress' ? 'bg-warning' : 'bg-danger'}">
             ${c.status}
@@ -64,25 +65,29 @@ async function loadComplaints() {
   }
 }
 
-// Submit new complaint (with location)
+// Submit new complaint
 document.getElementById('complaintForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const location = document.getElementById('location').value;
 
-  // Client-side check (extra safety)
   if (!location) {
     messageDiv.textContent = 'Please select a Location';
     messageDiv.classList.add('error');
     return;
   }
 
+  // Change button to loading state
+  const originalText = submitBtn.innerHTML;
+  submitBtn.innerHTML = 'Submitting...';
+  submitBtn.disabled = true;
+
   const formData = new FormData();
   formData.append('title', document.getElementById('title').value.trim());
   formData.append('category', document.getElementById('category').value);
   formData.append('description', document.getElementById('description').value.trim());
   formData.append('roomNumber', document.getElementById('roomNumber').value.trim());
-  formData.append('location', location); // NEW: send location
+  formData.append('location', location);
 
   const imageFile = document.getElementById('image').files[0];
   if (imageFile) {
@@ -99,22 +104,39 @@ document.getElementById('complaintForm').addEventListener('submit', async (e) =>
     const data = await res.json();
 
     if (res.ok) {
+      // Success: show Submitted! for 2 seconds
+      submitBtn.innerHTML = 'Submitted!';
+      submitBtn.classList.add('btn-success');
+
       messageDiv.textContent = 'Complaint submitted successfully!';
       messageDiv.classList.remove('error');
       messageDiv.classList.add('success');
 
-      // Clear form
-      document.getElementById('complaintForm').reset();
+      // Reset after 2 seconds
+      setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.classList.remove('btn-success');
+        submitBtn.disabled = false;
+      }, 2000);
 
-      // Reload table
+      // Clear form & reload table
+      document.getElementById('complaintForm').reset();
       loadComplaints();
     } else {
       messageDiv.textContent = data.message || 'Failed to submit complaint';
       messageDiv.classList.add('error');
+
+      // Reset button on error
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
     }
   } catch (err) {
     messageDiv.textContent = 'Network error. Please try again.';
     messageDiv.classList.add('error');
+
+    // Reset button on network error
+    submitBtn.innerHTML = originalText;
+    submitBtn.disabled = false;
   }
 });
 
