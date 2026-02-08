@@ -92,23 +92,21 @@ async function loadActiveComplaints() {
 
     complaints.forEach(c => {
       const student = c.studentId || {};
-      console.log('Active complaint student data:', student); // Debug (remove later)
-
       const row = document.createElement('tr');
       row.innerHTML = `
-        <td>${student.name || 'Unknown'}</td>
-        <td>${student.rollNumber || 'Unknown'}</td>
-        <td>${student.mobile || '-'}</td>
-        <td>${student.roomNumber || '-'}</td>        <!-- Lab from Excel -->
-        <td>${c.roomNumber || '-'}</td>              <!-- Hostel Room from complaint -->
-        <td>${c.location || '-'}</td>
-        <td>${c.title}</td>
-        <td><span class="badge bg-info">${c.category}</span></td>
-        <td>${c.description.substring(0, 80)}${c.description.length > 80 ? '...' : ''}</td>
-        <td>${c.imagePath ? `<img src="/${c.imagePath}" class="preview" alt="Photo">` : 'No photo'}</td>
-        <td>
-          <button class="btn btn-sm btn-warning me-1" onclick="updateStatus('${c._id}', 'In Progress')">In Progress</button>
-          <button class="btn btn-sm btn-success" onclick="updateStatus('${c._id}', 'Resolved')">Resolve</button>
+        <td data-label="Name">${student.name || 'Unknown'}</td>
+        <td data-label="Roll No">${student.rollNumber || 'Unknown'}</td>
+        <td data-label="Mobile">${student.mobile || '-'}</td>
+        <td data-label="Lab">${student.roomNumber || '-'}</td>
+        <td data-label="Room">${c.roomNumber || '-'}</td>
+        <td data-label="Location">${c.location || '-'}</td>
+        <td data-label="Title">${c.title}</td>
+        <td data-label="Category"><span class="badge bg-info">${c.category}</span></td>
+        <td data-label="Description">${c.description.substring(0, 80)}${c.description.length > 80 ? '...' : ''}</td>
+        <td data-label="Photo">${c.imagePath ? `<img src="/${c.imagePath}" class="preview" alt="Photo">` : 'No photo'}</td>
+        <td data-label="Actions">
+          <button class="btn btn-sm btn-warning me-1" onclick="updateStatus('${c._id}', 'In Progress', this)">In Progress</button>
+          <button class="btn btn-sm btn-success" onclick="updateStatus('${c._id}', 'Resolved', this)">Resolve</button>
         </td>
       `;
       activeBody.appendChild(row);
@@ -116,7 +114,6 @@ async function loadActiveComplaints() {
   } catch (err) {
     messageDiv.textContent = err.message || 'Error loading active complaints';
     messageDiv.classList.add('error');
-    console.error('Load active error:', err);
   }
 }
 
@@ -140,35 +137,36 @@ async function loadHistory() {
 
     history.forEach(c => {
       const student = c.studentId || {};
-      console.log('History complaint student data:', student); // Debug (remove later)
-
       const row = document.createElement('tr');
       row.innerHTML = `
-        <td>${student.name || 'Unknown'}</td>
-        <td>${student.rollNumber || 'Unknown'}</td>
-        <td>${student.mobile || '-'}</td>
-        <td>${student.roomNumber || '-'}</td>        <!-- Lab from Excel -->
-        <td>${c.roomNumber || '-'}</td>              <!-- Hostel Room from complaint -->
-        <td>${c.location || '-'}</td>
-        <td>${c.title}</td>
-        <td>${new Date(c.updatedAt).toLocaleString()}</td>
-        <td>${c.imagePath ? `<img src="/${c.imagePath}" class="preview" alt="Photo">` : 'No photo'}</td>
-        <td>
-          <button class="btn btn-sm btn-danger" onclick="deleteComplaint('${c._id}')">Delete</button>
-        </td>
-      `;
+      <td data-label="Name">${student.name || 'Unknown'}</td>
+      <td data-label="Roll No">${student.rollNumber || 'Unknown'}</td>
+      <td data-label="Mobile">${student.mobile || '-'}</td>
+      <td data-label="Lab">${student.roomNumber || '-'}</td>
+      <td data-label="Room">${c.roomNumber || '-'}</td>
+      <td data-label="Location">${c.location || '-'}</td>
+      <td data-label="Title">${c.title}</td>
+      <td data-label="Resolved At">${new Date(c.updatedAt).toLocaleString()}</td>
+      <td data-label="Photo">${c.imagePath ? `<img src="/${c.imagePath}" class="preview" alt="Photo">` : 'No photo'}</td>
+      <td data-label="Delete">
+        <button class="btn btn-sm btn-danger" onclick="deleteComplaint('${c._id}')">Delete</button>
+      </td>
+    `;
       historyBody.appendChild(row);
     });
   } catch (err) {
     messageDiv.textContent = err.message || 'Error loading history';
     messageDiv.classList.add('error');
-    console.error('Load history error:', err);
   }
-}
+};
 
-// Update status
-window.updateStatus = async (id, newStatus) => {
+// Update status with button feedback
+window.updateStatus = async (id, newStatus, button) => {
   if (!confirm(`Mark as "${newStatus}"?`)) return;
+
+  const originalText = button.innerHTML;
+  button.innerHTML = newStatus === 'In Progress' ? 'In Progressing...' : 'Resolving...';
+  button.disabled = true;
 
   try {
     const res = await fetch(`/api/complaints/${id}`, {
@@ -178,19 +176,36 @@ window.updateStatus = async (id, newStatus) => {
     });
 
     if (res.ok) {
-      messageDiv.textContent = `Status updated to ${newStatus}!`;
+      messageDiv.textContent = `${newStatus}!`;
       messageDiv.classList.remove('error');
       messageDiv.classList.add('success');
+
+      // Show success on button for 2 seconds
+      button.innerHTML = 'Done!';
+      button.classList.add('btn-success');
+
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.classList.remove('btn-success');
+        button.disabled = false;
+      }, 2000);
+
       loadActiveComplaints();
       loadHistory();
     } else {
       const data = await res.json();
       messageDiv.textContent = data.message || 'Failed to update';
       messageDiv.classList.add('error');
+
+      button.innerHTML = originalText;
+      button.disabled = false;
     }
   } catch (err) {
     messageDiv.textContent = 'Network error';
     messageDiv.classList.add('error');
+
+    button.innerHTML = originalText;
+    button.disabled = false;
   }
 };
 
