@@ -8,57 +8,28 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f4f7fa;
   color: #333;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .container {
   max-width: 1400px;
-  margin: 40px auto;
-  padding: 0 15px;
+  margin: 20px auto;
+  padding: 0 10px;
 }
 
 h2 {
   color: #2c3e50;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   text-align: center;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: #555;
-}
-
-input[type="text"],
-input[type="password"],
-textarea,
-select,
-input[type="file"] {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 16px;
-}
-
-input:focus, textarea:focus, select:focus {
-  outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 
 .btn {
   background-color: #3498db;
   color: white;
-  padding: 12px 24px;
+  padding: 10px 18px;
   border: none;
   border-radius: 6px;
-  font-size: 16px;
+  font-size: 14px;
   cursor: pointer;
   transition: background 0.3s;
 }
@@ -71,39 +42,26 @@ input:focus, textarea:focus, select:focus {
   background-color: #e74c3c;
 }
 
-.btn-danger:hover {
-  background-color: #c0392b;
-}
-
 .btn-warning {
   background-color: #f39c12;
-}
-
-.btn-warning:hover {
-  background-color: #e67e22;
 }
 
 .btn-success {
   background-color: #27ae60;
 }
 
-.btn-success:hover {
-  background-color: #219653;
-}
-
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
+  margin-top: 10px;
   background: white;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
   border-radius: 8px;
   overflow: hidden;
-  min-width: 600px; /* Prevents collapsing on very small screens */
 }
 
 th, td {
-  padding: 14px 16px;
+  padding: 8px 10px;
   text-align: left;
   border-bottom: 1px solid #eee;
 }
@@ -112,21 +70,22 @@ th {
   background-color: #2c3e50;
   color: white;
   font-weight: 600;
+  font-size: 13px;
 }
 
 tr:hover {
-  background-color: #f8f9fa;
+  background-color: #f9f9f9;
 }
 
 img.preview {
-  max-width: 120px;
-  border-radius: 6px;
-  margin-top: 8px;
+  max-width: 80px;
+  border-radius: 4px;
+  margin-top: 4px;
 }
 
 .message {
-  margin-top: 20px;
-  padding: 12px;
+  margin-top: 10px;
+  padding: 8px;
   border-radius: 6px;
   text-align: center;
 }
@@ -141,20 +100,21 @@ img.preview {
   color: #721c24;
 }
 
-/* Responsive table for mobile */
-.table-responsive {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
-}
-
+/* Mobile Stacked View - Clean & Compact */
 @media (max-width: 992px) {
   .container {
-    margin: 20px 10px;
-    padding: 0 10px;
+    margin: 10px 5px;
+    padding: 0 5px;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   table {
     border: 0;
+    margin-top: 8px;
   }
 
   table thead {
@@ -162,7 +122,7 @@ img.preview {
   }
 
   table tr {
-    margin-bottom: 10px;
+    margin-bottom: 4px; /* Very small gap between rows */
     display: block;
     border: 1px solid #ddd;
     border-radius: 6px;
@@ -170,46 +130,54 @@ img.preview {
   }
 
   table td {
-    display: block;
-    text-align: right;
-    font-size: 14px;
-    border-bottom: 1px dotted #ccc;
-    position: relative;
-    padding-left: 50%;
-    padding-right: 10px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    font-size: 13px;
+    border-bottom: 1px dotted #eee;
+    padding: 6px 10px;
+    min-height: 26px;
+    gap: 8px; /* Small gap between label and value */
+  }
+
+  table td:before {
+    content: attr(data-label) ":";
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 13px;
+    min-width: 100px; /* Fixed width for label */
+    flex-shrink: 0;
   }
 
   table td:last-child {
     border-bottom: 0;
   }
 
-  table td:before {
-    content: attr(data-label);
-    position: absolute;
-    left: 10px;
-    width: 45%;
-    padding-right: 10px;
-    white-space: nowrap;
-    font-weight: bold;
-    text-align: left;
-    color: #555;
-  }
-
+  /* Actions & Delete - centered */
   table td[data-label="Actions"],
   table td[data-label="Delete"] {
-    text-align: center;
-    padding-left: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 8px;
   }
 
-  /* Buttons on mobile */
   .btn-sm {
-    padding: 8px 12px;
-    font-size: 13px;
+    padding: 5px 10px;
+    font-size: 11px;
+    margin: 2px;
   }
-}
 
-/* Make sure headings are visible in mobile stacked view */
-td:before {
-  font-size: 14px;
-  color: #2c3e50;
+  /* Very small screens */
+  @media (max-width: 576px) {
+    table td {
+      padding: 5px 8px;
+      font-size: 12.5px;
+      gap: 6px;
+    }
+
+    table td:before {
+      min-width: 90px;
+      font-size: 12.5px;
+    }
+  }
 }
