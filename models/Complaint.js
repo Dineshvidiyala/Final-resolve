@@ -8,7 +8,7 @@ const complaintSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['water', 'electricity', 'cleaning', 'internet', 'other'],
+    enum: ['water', 'electricity', 'cleaning', 'internet', 'mess', 'other'],  // ← 'mess' added
     required: true
   },
   description: {
@@ -20,7 +20,7 @@ const complaintSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  location: {  // ← NEW FIELD
+  location: {
     type: String,
     enum: ['Hostel', 'Mess', 'Class', 'Ground'],
     required: true,
