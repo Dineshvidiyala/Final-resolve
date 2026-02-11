@@ -57,6 +57,12 @@ document.getElementById('excelUploadInput')?.addEventListener('change', async (e
   e.target.value = '';
 });
 
+// Helper function to display friendly category name
+function getDisplayCategory(category) {
+  if (category === 'mess') return 'Catering';
+  return category.charAt(0).toUpperCase() + category.slice(1); // Capitalize first letter
+}
+
 // Load active complaints
 async function loadActiveComplaints() {
   const category = document.getElementById('filterCategory').value;
@@ -101,7 +107,7 @@ async function loadActiveComplaints() {
         <td data-label="Room">${c.roomNumber || '-'}</td>
         <td data-label="Location">${c.location || '-'}</td>
         <td data-label="Title">${c.title}</td>
-        <td data-label="Category"><span class="badge bg-info">${c.category}</span></td>
+        <td data-label="Category"><span class="badge bg-info">${getDisplayCategory(c.category)}</span></td>
         <td data-label="Description">${c.description.substring(0, 80)}${c.description.length > 80 ? '...' : ''}</td>
         <td data-label="Photo">${c.imagePath ? `<img src="/${c.imagePath}" class="preview" alt="Photo">` : 'No photo'}</td>
         <td data-label="Actions">
@@ -147,6 +153,7 @@ async function loadHistory() {
         <td data-label="Location">${c.location || '-'}</td>
         <td data-label="Title">${c.title}</td>
         <td data-label="Resolved At">${new Date(c.updatedAt).toLocaleString()}</td>
+        <td data-label="Category"><span class="badge bg-info">${getDisplayCategory(c.category)}</span></td>
         <td data-label="Photo">${c.imagePath ? `<img src="/${c.imagePath}" class="preview" alt="Photo">` : 'No photo'}</td>
         <td data-label="Delete">
           <button class="btn btn-sm btn-danger" onclick="deleteComplaint('${c._id}')">Delete</button>
