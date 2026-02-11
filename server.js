@@ -86,6 +86,12 @@ app.post('/api/complaints', authenticate, upload.single('image'), async (req, re
   const { title, category, description, roomNumber, location } = req.body;
   const imagePath = req.file ? req.file.path : null;
 
+  // Validate category (optional - add 'mess' explicitly if you want strict validation)
+  const validCategories = ['water', 'electricity', 'cleaning', 'internet', 'mess', 'other'];
+  if (!validCategories.includes(category)) {
+    return res.status(400).json({ message: 'Invalid category' });
+  }
+
   if (!title || !category || !description || !roomNumber || !location) {
     return res.status(400).json({ message: 'Missing required fields' });
   }
@@ -120,14 +126,14 @@ app.get('/api/my-complaints', authenticate, async (req, res) => {
   }
 });
 
-// Get active complaints (admin only)
+// Get active complaints (admin only) - supports 'mess' category
 app.get('/api/complaints', authenticate, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
 
   const { category, roomNumber, status } = req.query;
   const filter = { status: { $ne: 'Resolved' } };
 
-  if (category) filter.category = category;
+  if (category) filter.category = category; // Already supports 'mess'
   if (roomNumber) filter.roomNumber = roomNumber;
   if (status) filter.status = status;
 
