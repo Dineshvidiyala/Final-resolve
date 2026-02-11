@@ -84,7 +84,7 @@ document.getElementById('complaintForm').addEventListener('submit', async (e) =>
 
   const formData = new FormData();
   formData.append('title', document.getElementById('title').value.trim());
-  formData.append('category', document.getElementById('category').value);
+  formData.append('category', document.getElementById('category').value); // ← "mess" will be sent here
   formData.append('description', document.getElementById('description').value.trim());
   formData.append('roomNumber', document.getElementById('roomNumber').value.trim());
   formData.append('location', location);
@@ -117,7 +117,9 @@ document.getElementById('complaintForm').addEventListener('submit', async (e) =>
         submitBtn.innerHTML = originalText;
         submitBtn.classList.remove('btn-success');
         submitBtn.disabled = false;
-      }, 2000);
+        messageDiv.textContent = ''; // Clear message after 4 seconds
+        messageDiv.classList.remove('success');
+      }, 4000);
 
       // Clear form & reload table
       document.getElementById('complaintForm').reset();
